@@ -185,4 +185,22 @@ Babel的作用在于将ES6代码进行降级，因为部分浏览器的版本较
    babel src -d dist
    ```
 
-   
+
+
+
+### 自定义脚本
+
+改写package.json，添加自己需要的语句
+
+```json
+"scripts": {
+    "build": "babel src\\example.js -o dist\\comiled.js"
+},
+```
+
+直接使用npm指令即可运行脚本
+
+```bash
+npm run build
+```
+
