@@ -4,6 +4,12 @@
 
 ## ES6
 
+> ES6， 全称 ECMAScript 6.0 ，是 JavaScript 的下一个版本标准，2015.06 发版。
+>
+> ES6 主要是为了解决 ES5 的先天不足，比如 JavaScript 里并没有类的概念，但是目前浏览器的 JavaScript 是 ES5 版本，大多数高版本的浏览器也支持 ES6，不过只实现了 ES6 的部分特性和功能。
+
+
+
 ### let和const和var的区别
 
 let是ES6的一种对于var的改进，它解决了变量穿透问题，使得变量的使用更为安全，限制了作用域；const作为常量解决了var声明的变量的可更改问题。
@@ -136,3 +142,47 @@ let res = arr.reduce((a, b) => a + b);
 console.log("res = ", res);
 ```
 
+
+
+## Babel
+
+Babel的作用在于将ES6代码进行降级，因为部分浏览器的版本较低可能不识别ES6，所以需要使用Babel。
+
+### 创建项目工程的步骤
+
+1. 创建文件夹，使用`npm init -y`命令进行初始化
+
+2. 创建文件src/example.js，加入要写的ES6代码
+
+3. 配置`.babelrc`文件，即创建名为`.babelrc`的文件，存放于项目的根目录下，该文件用于配置转码规则和插件，基本格式如下
+
+   ```json
+   {
+   	"presets": [], 	// 转码规则，例如"es2015"
+   	'plugins': []
+   }
+   ```
+
+4. 安装转码器，在项目中安装
+
+   ```bash
+   npm install --save-dev babel-preset-es2015
+   ```
+
+5. 转码
+
+   ```bash
+   # 转码结果写入一个文件
+   # --out-file 或 -o 参数指定输出文件
+   babel src/example.js --out-file dist/compiled.js
+   # 或者
+   babel src/example.js -o dist/compiled.js
+   
+   # 整个目录转码
+   # --out-dir 或 -d 参数指定输出文件
+   babel src --out-dir dist
+   # 或者
+   babel src -d dist
+   ```
+
+   
