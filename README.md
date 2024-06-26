@@ -204,3 +204,141 @@ Babel的作用在于将ES6代码进行降级，因为部分浏览器的版本较
 npm run build
 ```
 
+
+
+## 模块化
+
+### CommonJS规范
+
+​		对于JS代码而言，其代码量繁多，而且其并没有像Java、Python一样可以直接使用`import`导入其他代码并使用其中的方法，JS并不是一种模块化编程语言，但是通过CommonJS规范可以实现模块化开发：即每个文件是一个独立的模块。
+
+​		使用CommonJS进行模块化开发时，使用`module.exports`方法将本文件中的方法导出，其他文件只需要导入本文件即可使用本模块中的方法。
+
+导出过程如下：
+
+```js
+// 存在四个方法：加减乘除
+module.exports = {
+    sum,
+    sub,
+    mul,
+    di
+}
+// 以上写法是将方法名直接设置为方法名，实际上可以替换，如：
+module.exports = {
+    sum:sum1
+}
+// 即将本文件中的sum方法导出为sum1方法，其他文件调用本模块时使用sum1方法。
+```
+
+导入过程如下：
+
+```js
+const m = require('文件路径，即模块位置')
+m.sum(1, 1)
+```
+
+
+
+
+
+### ES6规范
+
+对于ES6的语法相对要简单
+
+对于导出而言，有两种方式
+
+- 对每个方法前加`export`修饰，导出该函数，如下
+
+```js
+export function getList(){
+    console.log("获取数据列表");
+}
+```
+
+- 使用export default控制导出域，其内部方法均会被导出
+
+```js
+export default{
+    getList(){
+        console.log("获取数据列表");
+    }
+}
+```
+
+
+
+导入方法同样有两种
+
+- 控制导入方法，使用时直接调用即可
+
+```js
+import {getList} from '模块位置'
+```
+
+- 全部导入，调用时要使用模块.方法名使用
+
+```js
+import user from '模块位置'
+```
+
+
+
+注意：浏览器默认不支持ES6语法，需要使用Babel降级为ES2015
+
+
+
+## WebPack
+
+使用WebPack可以将js文件、css文件打包并加密，简化了文件数量
+
+
+
+### 合并JS
+
+创建nodejs项目之后，如有js代码，将其归类到一个目录下，并准备好一个入口文件main.js，就是对模块集中进行引入
+
+在根目录下定义一个webpack.config.js文件配置打包的规则，最后执行`webpack`命令进行打包
+
+在webpack.config.js中应按照如下配置:
+
+```js
+// 导入path模块：nodejs内置模块
+const path = require("path");
+
+// 定义JS打包的规则
+module.exports = {
+    // 入口函数从哪里开始进行
+    entry:"./src/main.js",
+    // 编译成功后把内容输出到哪里去
+    output:{
+        // 定义属于出的指定目录，__dirname代表当前项目根目录，生成dist文件夹
+        path:path.resolve(__dirname, "./dist"),
+        // 合并的js文件存储在dist/bundule.js文件中
+        filename:"bundle.js"
+	}
+}
+```
+
+
+
+### 合并CSS
+
+合并CSS需要先使用npm安装style-loader和css-loader，再到webpack.config.js配置规则，最后创建一个main.js，第一行引入style.css，编译即可。
+
+webpack.config.js内部应如此定义：
+
+```js
+module.exports = {
+    ...
+    module:{
+        rule:[{
+            test:/\.css$/,	// 把项目中所有的.css结尾的文件进行打包
+            use:["style-loader","css-loader"]
+        }]
+    }
+}
+```
+
+
+
