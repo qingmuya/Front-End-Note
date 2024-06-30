@@ -342,3 +342,253 @@ module.exports = {
 
 
 
+## VUE
+
+> 渐进式JS框架
+
+
+
+### 安装VUE
+
+使用`npm init vue@version`命令即可完成安装。
+
+再次使用`npm install`命令将所需拓展下载即可。
+
+
+
+### 模板语法
+
+#### 文本插值
+
+最基本的数据绑定形式，使用“Mustache”语法（即双大括号）
+
+```vue
+<template>
+    <p>{{ msg }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            msg:"这是一个p标签"
+        }
+    }
+}
+</script>
+```
+
+
+
+#### Js表达式
+
+每个绑定仅支持**单一表达式**，也就是一段可以代表某数值的js代码。例如`let a = 3`是一个赋值语句，其本身不能代表一个具体的数值，所以不可绑定使用。
+
+需要注意的是其也不支持条件控制，但是可以改为三元表达式：这也对应了其单一表达式的性质。
+
+```vue
+<template>
+    <p>{{ num + 1 }}</p>
+    <p>{{ ok ? "Yes" : "No" }}</p>
+    <p>{{ msg.split("").reverse().join("") }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            num:10,
+            ok:true,
+            msg:"0123456789"
+        }
+    }
+}
+</script>
+```
+
+
+
+
+
+#### 原始HTML
+
+双大括号会将数据插值转换为纯文本而不是解析为HTML，可以使用`v-html`标签插入HTML。
+
+```vue
+<template>
+    <p v-html="link"></p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            link:"<a href='https://www.baidu.com'>百度</a>"
+        }
+    }
+}
+</script>
+```
+
+
+
+### 属性绑定
+
+使用`v-bind`注明属性，无需使用双大括号，直接引用即可。
+
+```vue
+<template>
+    <div v-bind:id="id" v-bind:class="class">
+        测试
+    </div>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            class:"appclass",
+            id:"appid"
+        }
+    }
+}
+</script>
+```
+
+需要注意的是如果绑定的值是`null`或者`undefined`，那么该属性将会从渲染的元素上移除。
+
+同时可以将v-bind直接简写为`:`
+
+此外还可以**动态绑定多个值**
+
+```vue
+<template>
+    <div v-bind="Attrs">测试</div>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            Attrs: {
+                id:"id",
+                class:"class"
+            }
+        }
+    }
+}
+</script>
+```
+
+
+
+### 条件渲染
+
+#### v-if
+
+用于条件性地渲染一块内容，这块内容只会在指令地表达式返回值为真时才会被渲染。
+
+
+
+#### v-show
+
+也可以控制渲染，与上面用法一致，但是i其无法多分支判断。
+
+
+
+二者之间地不同之处在于：
+
+- `v-if`是真实的按照条件渲染，在判断条件切换时，条件区块内的事件监听器和子组件都会被销毁与重建。`v-if`也是**惰性**的，如果在首次渲染时条件之为false，则不会做任何事，只有当条件首次变为true时才会渲染。
+- `v-show`不论初始条件如何都会渲染，只有css的`display`属性会切换
+
+> 总的来说，v-if有更高的切换开销，而v-show有更高的初始化渲染开销。因此，如果需要频繁切换，则使用v-show较好；如果在运行时绑定条件很少改变，则v-if会更合适。
+
+
+
+### 列表渲染
+
+通过使用`v-for`指令基于一个数组渲染一个列表。`v-for`指令的值需要使用`item in items`形式的特殊语法，其中`items`是源数据的数组，而`item`是迭代项的别名。此处可以使用`of`代替`in  `
+
+```vue
+<template>
+    <p v-for="name in names">{{ name }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:['丁真', '理塘', '雪豹']
+        }
+    }
+}
+</script>
+```
+
+ 
+
+v-for也支持使用可选的第二个参数表示当前项的位置索引
+
+```vue
+<template>
+    <p v-for="name,index in names">{{ index }}:{{ name }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:['丁真', '理塘', '雪豹']
+        }
+    }
+}
+</script>
+```
+
+其也支持三个参数，也就是`key`对应的值，需要注意的是遍历顺序为`value-key-index`
+
+```vue
+<template>
+    <p v-for="value, key, index in names">{{ index }}-{{ key }}:{{ value }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:{
+                name:'顶针',
+                address:'理塘',
+                pony:'雪豹'
+            }
+        }
+    }
+}
+</script>
+```
+
+
+
+#### 通过key管理状态
+
+对于v-for循环产生的元素，应定义一个唯一的`key`属性方便vue追踪每个节点的标识，从而重用和重新排序现有的元素。
+
+```vue
+<template>
+    <p v-for="name, index in names" :key="index">{{ name }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:['理塘', '丁真', '珍珠']
+        }
+    }
+}
+</script>
+```
+
+`key`是一个通过`v-bind`绑定的特殊属性，`key`绑定的值期望是一个基础类型的值，例如字符串或number类型。  
+
+注意，`key`的值应该是不会变动的，所以不要使用index。
