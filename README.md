@@ -592,3 +592,211 @@ export default{
 `key`是一个通过`v-bind`绑定的特殊属性，`key`绑定的值期望是一个基础类型的值，例如字符串或number类型。  
 
 注意，`key`的值应该是不会变动的，所以不要使用index。
+
+
+
+### 事件处理
+
+可以使用`v-on`指令（简写为`@`）来监听DOM时间，并在时间触发时执行对应的JavaScript。用法：`v-on:click="methodName"`或`@click="handler"`。
+
+事件处理器的值可以是：
+
+1. **内联事件处理器**：时间被触发时执行的内联JavaScript语句(与onclick类似)
+2. **方法事件处理器**：一个指向组件上定义的方法的属性名或是路径
+
+
+
+#### 内联事件处理器
+
+适用于简单场景
+
+```vue
+<template>
+    <button @click="num++">add</button>
+    <p>{{ num }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            num:0
+        }
+    }
+}
+</script>
+```
+
+
+
+#### 方法事件处理器
+
+适用于复杂场景
+
+```vue
+<template>
+    <button @click="addNum">add</button>
+    <p>{{ num }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            num:0
+        }
+    },
+    methods:{
+        addNum(){
+            this.num++
+        }
+    }
+}
+</script>
+```
+
+
+
+### 事件传参
+
+事件参数可以获取`event`对象和通过事件传递数据
+
+
+
+#### 获取event对象
+
+直接获取e即可
+
+```vue
+<template>
+    <button @click="addNum">add</button>
+    <p>{{ num }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            num:0
+        }
+    },
+    methods:{
+        addNum(e){
+            e.target.innerHTML = "add " + this.num;
+            this.num++
+        }
+    }
+}
+</script>
+```
+
+
+
+#### 传递参数过程中获取event
+
+需要在`event`前添加`$`
+
+```vue
+<template>
+    <p @click="getNameHandler(name, $event)" v-for="(name, index) in names" :key="index">{{ name }}</p>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:['理塘', '丁真', '珍珠']
+        }
+    },
+    methods:{
+        getNameHandler(name, e){
+            console.log(name)
+            console.log(e)
+        }
+    }
+}
+</script>
+```
+
+
+
+### 事件修饰符
+
+在处理事件时调用event.preventDefault()或event.stopPropagation()是很常见的。尽管我们可以直接在方法内调用，但如果方法能更专注于数据逻辑而不用去处理DOM事件的细节会更好。
+
+常用的事件修饰符有：
+
+- .stop
+- .prevent
+- .once
+- .enter
+
+
+
+#### 阻止默认事件
+
+通过方法体进行阻止
+
+```vue
+<template>
+    <a @click="clickHandler" href="www.baidu.com">百度</a>
+</template>
+
+<script>
+export default{
+    data(){
+        return {}
+    },
+    methods:{
+        clickHandler(e){
+            e.preventDefault()
+        }
+    }
+}
+</script>
+```
+
+通过修饰符直接阻止
+
+```vue
+<template>
+    <a @click.prevent href="www.baidu.com">百度</a>
+</template>
+
+<script>
+export default{
+    data(){
+        return {}
+    },
+}
+</script>
+```
+
+
+
+#### 阻止事件冒泡
+
+```vue
+<template>
+    <div @click="clickdiv">
+        <p @click.stop="clickp">你好</p>
+    </div>
+</template>
+
+<script>
+export default{
+    data(){
+        return {}
+    },
+    methods:{
+        clickdiv(){
+            console.log("div")
+        },
+        clickp(){
+            console.log("p")
+        }
+    }
+}
+</script>
+```
+
