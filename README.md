@@ -800,3 +800,427 @@ export default{
 </script>
 ```
 
+
+
+### 数组变化侦测
+
+#### 变更方法
+
+Vue能够侦听响应式数组的变更方法，并在它们被调用时触发相关的更新。这些变更方法包括:
+
+push()、pop()、shift()、unshift()、splice、sort()、reverse()
+
+也就是说在调用这些方法后，数据会立即更新同时引起页面的变化。
+
+```vue
+<template>
+    <button @click="addName">添加数据</button>
+    <li v-for="name, index in names" :key="index">{{ name }}</li>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:['理塘', '丁真', '珍珠']
+        }
+    },
+    methods:{
+        addName(){
+            this.names.push('雪豹')
+        }
+    }
+}
+</script>
+```
+
+
+
+#### 替换一个数组
+
+变更方法，顾名思义，就是会对调用它们的原数组进行变更。相对地，也有一些不可变(immutable)方法，例如`fiter()`，`concat()`和`slice()`，这些都不会更改原数组，而总是返回一个新数组。当遇到的是非变更方法时，我们需要将旧的数组替换为新的
+
+```vue
+<template>
+    <button @click="addall">合并数据</button>
+    <li v-for="name, index in names" :key="index">{{ name }}</li>
+</template>
+
+<script>
+export default{
+    data(){
+        return {
+            names:['理塘', '丁真', '珍珠'],
+            names1:['原神']
+        }
+    },
+    methods:{
+        addall(){
+            this.names = this.names.concat(this.names1)
+        }
+    }
+}
+</script>
+```
+
+
+
+### 计算属性
+
+模板中的表达式虽然方便，但也只能用来做简单的操作。如果在模板中写太多逻辑，会让模板变得臃肿，难以维护。因此推荐使用计算属性来描述依赖响应式状态的复杂逻辑 。
+
+```vue
+<template>
+    <h1>{{ title }}</h1>
+    <p>{{ IsTitleExist }}</p>
+</template>
+
+<script>
+
+export default{
+    data(){
+        return {
+            title:"这是一个标题"
+        }
+    },
+    computed:{
+        IsTitleExist(){
+            return this.title.length > 0 ? 'Yes' : 'No'
+        }
+    }
+}
+</script>
+```
+
+区别在于计算属性值会基于其响应式依赖被缓存。一个计算属性仅会在其响应式依赖更新时才重新计算；方法调用总是会在重渲染发生时再次执行函数。
+
+也就是说在对一些多用的渲染实例使用计算属性会节省性能。
+
+
+
+### Class绑定
+
+数据绑定的一个常见需求场景是操纵元素的CSS class列表，因为`class`是attribute，我们可以和其他attribute一样使用`v-bind`将它们和动态的字符串绑定。但是，在处理比较复杂的绑定时，通过拼接生成字符串是麻烦且易出错的。因此，Vue专门为`class`的`v-bind`用法提供了特殊的功能增强。除了字符串外，表达式的值也可以是对象或数组。
+
+即可以在数组中嵌套渲染样式。
+
+```vue
+<template>
+    <p :class="classobject">这是一段文字</p>
+</template>
+
+<script>
+
+export default{
+    data(){
+        return {
+            classobject:{
+                'isactive':true,
+                'text-red':true
+            }
+        }
+    }
+} 
+</script>
+<style>
+.isactive{
+    font-size: 30px;
+}
+.text-red{
+    color:red;
+}
+</style>
+```
+
+只能数组嵌套对象而不能对象嵌套数组。
+
+
+
+### Style绑定
+
+数据绑定的一个常见需求场景是操纵元素的CSS style列表，因为`style`是attribute，我们可以和其他attribute一样使用`v-bind`将它们和动态的字符串绑定。但是，在处理比较复杂的绑定时，通过拼接生成字符串是麻烦且易出错的。因此,Vue 专门为style的v-bind用法提供了特殊的功能增强。除了字符串外，表达式的值也可以是对象或数组
+
+与Class绑定一致
+
+
+
+### 侦听器
+
+可以使用`watch`选项在每次响应式属性发生变化时触发一个函数，该函数的名称必须与文本插值的变量名一致。
+当数据发生变化后，都会自动执行`watch`标签内的同名函数。
+
+```vue
+<template>
+
+    <p>{{ message }}</p>
+
+    <button @click="updatevalue">修改数据</button>
+
+</template>
+
+  
+
+<script>
+
+  
+
+export default{
+
+    data(){
+
+        return {
+
+            message:"Hello World!"
+
+        }
+
+    },
+
+    methods:{
+
+        updatevalue(){
+
+            this.message = "理塘丁真"
+
+        }
+
+    },
+
+    watch:{
+
+        // 这两个变量名随意命名，顺序是改变后变量和改变前数据
+
+        message(newValue, oldValue){
+
+            // 数据发送变化时自动执行
+
+            console.log(newValue, oldValue)
+
+        }
+
+    }
+
+}
+
+</script>
+```
+
+
+
+### 表单输入绑定
+
+在前端处理表单时，我们常常需要将表单输入框的内容同步给JavaScript 中相应的变量。手动连接值绑定和更改事件监听器可能会很麻烦, `v-model`指令简化了这一步骤：可以简化理解为双向绑定。
+
+```vue
+<template>
+
+    <input type="text" v-model="message">
+
+    <p>{{ message }}</p>
+
+</template>
+
+  
+
+<script>
+
+  
+
+export default{
+
+    data(){
+
+        return {
+
+            message:""
+
+        }
+
+    }
+
+}
+
+</script>
+```
+
+#### 复选框
+
+可以绑定布尔数值。
+
+```vue
+<template>
+
+    <input type="checkbox" id="checkbox" v-model="check" />
+
+    <label for="checkbox">{{ check ? 'Yes' : 'No' }}</label>
+
+</template>
+
+  
+
+<script>
+
+  
+
+export default{
+
+    data(){
+
+        return {
+
+            check:false
+
+        }
+
+    }
+
+}
+
+</script>
+```
+
+
+
+#### 修饰符
+
+v-`model`也提供了修饰符：`.lazy`、`.number`、`.trim`
+
+##### .lazy
+
+默认情况下，`v-model`会在每次`input`事件后更新数据。你可以添加`lazy`修饰符来改为在每次`change`事件后更新数据。
+
+```vue
+<template>
+
+    <input type="text" v-model.lazy="message">
+
+    <p>{{ message }}</p>
+
+</template>
+
+  
+
+<script>
+
+  
+
+export default{
+
+    data(){
+
+        return {
+
+            message:"",
+
+        }
+
+    }
+
+}
+
+</script>
+```
+
+
+
+### 模板引用
+
+虽然Vue的声明性渲染模型为你抽象了大部分对DOM的直接操作，但在某些情况下，我们仍然需要直接访问底层DOM元素。要实现这一点，我们可以使用特殊的`ref` 属性。
+
+挂载结束后引用都会被暴露在`this.$refs`之上。
+
+```vue
+<template>
+
+    <div ref="temp" class="newdiv">{{ content }}</div>
+
+    <input type="text" ref="name">
+
+    <button @click="update">修改数据</button>
+
+</template>
+
+  
+
+<script>
+
+  
+
+export default{
+
+    data(){
+
+        return {
+
+            content:"此处可更改"
+
+        }
+
+    },
+
+    methods:{
+
+        update(){
+
+            this.$refs.temp.innerHTML = this.$refs.name.value
+
+        }
+
+    }
+
+}
+
+</script>
+```
+
+
+
+### 组件组成
+
+组件最大的优势就是可复用性；当使用构建步骤时，一般会将Vue 组件定义在一个单独的`.vue`文件中，这被叫做单文件组件(简称SFC)
+
+```vue
+<template>
+
+    <!-- 标签形式 -->
+
+    <newVue />
+
+    <!-- 修改命名 -->
+
+    <new-vue />
+
+</template>
+
+  
+
+<script>
+
+  
+
+import newVue from "./components/newVue.vue"
+
+  
+
+export default{
+
+    components:{
+
+        newVue
+
+    }
+
+}
+
+</script>
+```
+
+scoped：让当前样式只在当前组件中生效。
+
+
+
+### 组件嵌套关系
+
+> 组件允许我们将UI划分为独立的、可重用的部分，并且可以对每个部分进行单独的思考。在实际应用中，组件常常被组织成层层嵌套的树状结构。
+> 
+> 这和我们嵌套HTML元素的方式类似，Vue实现了自己的组件模型，使我们可以在每个组件内封装自定义内容与逻辑。
