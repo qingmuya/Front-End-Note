@@ -595,7 +595,9 @@ export default{
 
 
 
-### 事件处理
+### 事件
+
+#### 事件处理
 
 可以使用`v-on`指令（简写为`@`）来监听DOM时间，并在时间触发时执行对应的JavaScript。用法：`v-on:click="methodName"`或`@click="handler"`。
 
@@ -606,7 +608,7 @@ export default{
 
 
 
-#### 内联事件处理器
+##### 内联事件处理器
 
 适用于简单场景
 
@@ -629,7 +631,7 @@ export default{
 
 
 
-#### 方法事件处理器
+##### 方法事件处理器
 
 适用于复杂场景
 
@@ -657,13 +659,13 @@ export default{
 
 
 
-### 事件传参
+#### 事件传参
 
 事件参数可以获取`event`对象和通过事件传递数据
 
 
 
-#### 获取event对象
+##### 获取event对象
 
 直接获取e即可
 
@@ -692,7 +694,7 @@ export default{
 
 
 
-#### 传递参数过程中获取event
+##### 传递参数过程中获取event
 
 需要在`event`前添加`$`
 
@@ -720,7 +722,7 @@ export default{
 
 
 
-### 事件修饰符
+#### 事件修饰符
 
 在处理事件时调用event.preventDefault()或event.stopPropagation()是很常见的。尽管我们可以直接在方法内调用，但如果方法能更专注于数据逻辑而不用去处理DOM事件的细节会更好。
 
@@ -733,7 +735,7 @@ export default{
 
 
 
-#### 阻止默认事件
+##### 阻止默认事件
 
 通过方法体进行阻止
 
@@ -774,7 +776,7 @@ export default{
 
 
 
-#### 阻止事件冒泡
+##### 阻止事件冒泡
 
 ```vue
 <template>
@@ -1175,7 +1177,9 @@ export default{
 
 
 
-### 组件组成
+### 组件
+
+#### 组件组成
 
 组件最大的优势就是可复用性；当使用构建步骤时，一般会将Vue 组件定义在一个单独的`.vue`文件中，这被叫做单文件组件(简称SFC)
 
@@ -1219,8 +1223,172 @@ scoped：让当前样式只在当前组件中生效。
 
 
 
-### 组件嵌套关系
+#### 组件嵌套关系
 
 > 组件允许我们将UI划分为独立的、可重用的部分，并且可以对每个部分进行单独的思考。在实际应用中，组件常常被组织成层层嵌套的树状结构。
 > 
 > 这和我们嵌套HTML元素的方式类似，Vue实现了自己的组件模型，使我们可以在每个组件内封装自定义内容与逻辑。
+
+
+
+#### 组件注册方式
+
+一个Vue组件在使用前需要先被"注册”，这样Vue 才能在渲染模板时找到其对应的实现。组件注册有两种方式:全局注册和局部注册
+
+
+
+##### 全局注册
+
+在main.js中注册组件，在App.vue中直接插入标签即可。
+
+在main.js中注册：
+
+```vue
+const app = createApp(App)
+
+app.component("Header", Header)
+
+app.mount('#app')
+```
+
+App.vue中引用方式：
+
+```vue
+<template>
+	<Header />
+</template>
+```
+
+
+
+##### 局部注册
+
+全局注册虽然很方便，但有以下几个问题:
+
+1. 全局注册，但并没有被使用的组件无法在生产打包时被自动移除(也叫"tree-shaking")。如果你全局注册了一个组件，即使它并没有被实际使用，它仍然会出现在打包后的JS文件中
+2. 全局注册在大型项目中使项目的依赖关系变得不那么明确。在父组件中使用子组件时，不太容易定位子组件的实现。和使用过多的全局变量一样，这可能会影响应用长期的可维护性
+
+局部注册需要使用`components`选项
+
+
+
+#### 组件传递数据---Props
+
+组件与组件之间不是完全独立的，而是有交集的，那就是组件与组件之间是可以传递数据的传递数据的解决方案就是`props`
+
+在父组件中给子组件传递数据：
+
+```vue
+<template>
+    <h3>Parent</h3>
+    <Child title = "Parent Data"/>
+</template>
+```
+
+子组件接收数据：
+
+```vue
+<script>
+    export default{
+        props:["title"]
+    }
+</script>
+```
+
+
+
+组件之间也可以传递动态数据：即传递变量
+
+父组件中声明：
+
+```vue
+<template>
+    <h3>Parent</h3>
+    <Child :title = "msg"/>
+</template>
+
+<script>
+import Child from "./child.vue"
+
+export default{
+    data(){
+        return {
+            msg:"Hello World"
+        }
+    },
+    components:{
+        Child
+    }
+}
+</script>
+```
+
+需要注意的是：传递动态数据时要使用`v-bind`以及`""`包裹变量名
+
+
+
+##### 组件传递数据类型
+
+通过props传递数据，不仅可以传递字符串类型的数据，还可以是其他类型，例如:数字、对象、数组等。但实际上任何类型的值都可以作为props的值被传递
+
+
+
+##### 组件传递Proprs校验
+
+可以校验父组件传递的数据类型，子组件中声明如下：
+
+```vue
+<template>
+    <h3>Child</h3>
+    <p>{{ title }}</p>
+</template>
+<script>
+    export default{
+        props:{
+            title:{
+                type:[String, Number, Array, Object]
+            }
+        }
+    }
+</script>
+```
+
+还可以添加`default`属性，即设置默认值，其中数字和字符串可以直接设置default值，但是如果是数组和对象，必须通过工厂函数(即函数)返回默认值。
+
+```vue
+<script>
+    export default{
+        props:{
+            title:{
+                type:[String, Number, Array, Object],
+                default(){
+                    return ['一眼', '丁真']
+                }
+            }
+        }
+    }
+</script>
+```
+
+设置必选项，则父组件必须向子组件传递相关数据。通过在子组件中声明`require`属性即可。
+
+```vue
+<script>
+    export default{
+        props:{
+            title:{
+                type:[String, Number, Array, Object],
+                default(){
+                    return ['一眼', '丁真']
+                },
+                required:true
+            }
+        }
+    }
+</script>
+```
+
+
+
+**注意：Props的数据是只读的，不允许修改。**
+
