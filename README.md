@@ -1392,3 +1392,143 @@ export default{
 
 **注意：Props的数据是只读的，不允许修改。**
 
+
+
+#### 组件事件
+
+在组件的模板表达式中，可以直接使用`$emit`方法触发自定义事件触发自定义事件的目的是组件之间传递数据，即可以将子组件中的数据传递给父组件。
+
+子组件中定义为：
+
+```vue
+<template>
+    <h3>Child</h3>
+    <button @click="diliverDataToParent">传递数据给父组件</button>
+</template>
+<script>
+    export default{
+        methods:{
+            diliverDataToParent(){
+                // someEvent为父组件中定义的函数
+                this.$emit("someEvent", "子组件中的数据")
+            }
+        }
+    }
+</script>
+```
+
+父组件中定义为：
+
+```vue
+<template>
+    <h3>Parent</h3>
+    <Child @someEvent="getData"/>
+    <p>{{ msg }}</p>
+</template>
+
+<script>
+import Child from "./child.vue"
+
+export default{
+    components:{
+        Child
+    },
+    data(){
+        return {
+            msg:''
+        }
+    },
+    methods:{
+        getData(data){
+            this.msg = data
+        }
+    }
+}
+</script>
+```
+
+
+
+#### 组件事件配合v-model使用
+
+不同的组件之间也可以通过`v-model`配合`this.$emit`进行数据传递
+
+
+
+#### 组件数据传递
+
+props也可以实现子传父。
+
+
+
+### 插槽Slots
+
+`<slot>`元素是一个插槽出口，表示了父元素提供的插槽内容将在哪里被渲染。
+
+接收插槽数据就是在父组件中使用双标签，在双标签内部写入内容即可。
+
+
+
+插槽内容是可以访问到父组件的数据作用域，因为插槽内容本身是在父组件模板中定义的。
+
+插槽之间的数据如需按需使用，则要将插槽内的内容嵌套在`<template>`里，并使用`v-slot`指定名字，方便调用。
+
+v-slot有对应的简写#，因此`<template v-slot:header>`可以简写为`<template #header>`。其意思就是“将这部分模板片段传入子组件的header插槽中”
+
+
+
+### 组件声明周期
+
+组件有八个声明周期。
+
+1 beforeCreate(创建前)
+
+2 created(创建后)
+
+3 beforeMount(载入前)
+
+4 mounted(载入后)
+
+5 beforeUpdate(更新前)
+
+6 updated(更新后)
+
+7 beforeDestroy(销毁前)
+
+8 destroyed(销毁后)
+
+
+
+### 动态组件
+
+`<component>`本身可以承载组件，使用`:is`可以绑定其具体承载哪个标签。
+
+
+
+### 组件保持存活
+
+当使用`<component :is="...">`来在多个组件间作切换时，被切换掉的组件会被卸载。我们可以通过<keep-alive>组件强制被切换掉的组件仍然保持′存活"的状态
+
+
+
+### 异步组件
+
+在大型项目中，我们可能需要拆分应用为更小的块，并仅在需要时再从服务器加载相关组件。Vue提供了`defineAsyncComponent`方法来实现此功能。
+
+使用该导入方式即可异步加载。
+
+```vue
+const Component = defineAsyncComponent(() =>
+	import('./components/Component.vue')
+)
+```
+
+
+
+### 依赖注入
+
+通常情况下，当我们需要从父组件向子组件传递数据时，会使用props。想象一下这样的结构:有一些多层级嵌套的组件，形成了一颗巨大的组件树，而某个深层的子组件需要一个较远的祖先组件中的部分数据。在这种情况下，如果仅使用props则必须将其沿着组件链逐级传递下去，这会非常麻烦。
+
+该问题即为prop逐级透传。
+
+`provide`和`inject`可以帮助我们解决这一问题。一个父组件相对于其所有的后代组件，会作为依赖提供者。任何后代的组件树，无论层级有多深，都可以注入由父组件提供给整条链路的依赖。
