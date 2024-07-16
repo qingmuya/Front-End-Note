@@ -1532,3 +1532,26 @@ const Component = defineAsyncComponent(() =>
 该问题即为prop逐级透传。
 
 `provide`和`inject`可以帮助我们解决这一问题。一个父组件相对于其所有的后代组件，会作为依赖提供者。任何后代的组件树，无论层级有多深，都可以注入由父组件提供给整条链路的依赖。
+
+
+
+### Axios
+
+使用Axios可以发送请求，导入库：
+
+```html
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+```
+
+- 发送GE请求：
+
+```html
+axios.get(url).then((res)=>{...}).catch((err)=>{...})
+```
+
+- POST
+
+```html
+axios.post(url, data).then((res)=>{...}).catch((err)=>{...})
+```
+
