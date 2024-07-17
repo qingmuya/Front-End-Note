@@ -1555,3 +1555,101 @@ axios.get(url).then((res)=>{...}).catch((err)=>{...})
 axios.post(url, data).then((res)=>{...}).catch((err)=>{...})
 ```
 
+
+
+### Element-Plus
+
+按照文档使用即可。
+
+[Element - 网站快速成型工具](https://element.eleme.cn/#/zh-CN)
+
+
+
+### 跨域
+
+在浏览器方配置代理，解决跨域问题。
+
+
+
+### 路由
+
+路由，从起点到终点时，决定从起点到终点的路径的进程，在前端工程中，路由指的是根据不同的访问路径，展示不同组件的内容。Vue Router是Vue.js的官方路由，它与Vue.js深度集成，让Vue.js构建单页面应用变得更加轻而易举
+
+
+
+#### 安装路由
+
+```bash
+npm install vue-router@4
+```
+
+
+
+#### 创建路由器并导出
+
+```js
+//导入vue-router
+import { createRouter, createWebHistory } from 'vue-router'
+//导入组件
+import LoginVue from '@/views/Login.vue'
+import LayoutVue from '@/views/Layout.vue'
+
+//定义路由关系
+const routes = [
+    { path: '/login', component: LoginVue },
+    { path: '/', component: LayoutVue }
+]
+
+//创建路由器
+const router = createRouter({
+    history: createWebHistory(),
+    routes: routes
+});
+
+export default router
+```
+
+
+
+#### 在vue应用实例中使用router
+
+在main.js中导入创建应用实力的js文件，并调用实例的use方法使用路由器
+
+```js
+import router from '@/router'
+
+app.use(router)
+```
+
+
+
+#### 定义展示路由组件的地方
+
+在App.vue文件的template标签中，定义router-view标签
+
+```html
+<template>
+   <router-view></router-view>
+</template>
+```
+
+将来不管根据路由匹配到的组件内容，会在router-view标签内进行展示
+
+
+
+#### 页面切换
+
+在登录成功后，需要通过代码的方式将页面切换到首页，此时就需要调用路由器相关的API
+
+**获取路由器**
+
+```js
+import { useRouter } from 'vue-router'
+const router = useRouter();
+```
+
+**调用API**
+
+```js
+router.push('/')
+```
